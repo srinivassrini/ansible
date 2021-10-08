@@ -1,0 +1,30 @@
+- name: playbook to bootstrap managed ubuntu nodes
+  hosts: all
+  become: true
+  become_user: root
+  gather_facts: true
+
+  tasks:
+    - name: Installation PHP 7.4
+      command: sudo amazon-linux-extras install -y lamp-mariadb10.2-php7.2 php7.2
+
+    - name: install apache httpd
+      yum:
+        name: httpd
+        state: latest
+
+    - name: ensure httpd is running
+      service:
+        name: httpd
+        state: restarted
+
+    - name: copy the website template to the server
+      template:
+        src: "templates/login.php"
+        dest: "/var/www/html/login.php"
+
+    - name: copy the website template to the server
+      template:
+        src: "templates/signup.php"
+        dest: "/var/www/html/signup.php"
+
