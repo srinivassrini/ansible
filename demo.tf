@@ -79,7 +79,17 @@ variable "admin_pass" {
 	default = "password"
 	}
 	
+variable "vpc_peer" {
+	default = "vpc-5d255236"
+	}
 	
+variable "vpc_peer_cidr" {
+	default = "172.31.0.0/16"
+	}
+
+variable "defaultroutetableid" {
+	default = "rtb-5e2a1635"
+	}
 	
 #VPC
 resource "aws_vpc" "vpc" {
@@ -237,6 +247,13 @@ resource "aws_route" "privateroute" {
   nat_gateway_id  = aws_nat_gateway.natgateway.id
 }
 
+resource "aws_route" "peerroute" {
+  route_table_id            = aws_route_table.privateroutetable1.id
+  destination_cidr_block    = var.vpc_peer_cidr
+  vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
+}
+
+
 resource "aws_route_table_association" "privateroutetableassociation1" {
   subnet_id     = aws_subnet.privatesubnet1.id
   route_table_id = aws_route_table.privateroutetable1.id
@@ -381,6 +398,12 @@ resource "aws_route" "privateroute3" {
   route_table_id            = aws_route_table.privateroutetable3.id
   destination_cidr_block    = "0.0.0.0/0"
   nat_gateway_id  = aws_nat_gateway.natgateway.id
+}
+
+resource "aws_route" "peerroute2" {
+  route_table_id            = aws_route_table.privateroutetable3.id
+  destination_cidr_block    = var.vpc_peer_cidr
+  vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
 }
 
 resource "aws_route_table_association" "privateroutetableassociation3" {
@@ -569,5 +592,19 @@ resource "aws_lb_target_group_attachment" "tgattachment2" {
 }
 
 
+#VPC Peering
+resource "aws_vpc_peering_connection" "peer" {
+  peer_vpc_id   = aws_vpc.vpc.id
+  vpc_id        = var.vpc_peer
+  auto_accept   = true
 
+  tags = {
+    Name = "terra vpc peer"
+  }
+}
 
+resource "aws_route" "defaultpeer" {
+  route_table_id            = var.defaultroutetableid
+  destination_cidr_block    = var.vpc_cidr
+  vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
+}

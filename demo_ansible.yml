@@ -28,3 +28,22 @@
         src: "templates/signup.php"
         dest: "/var/www/html/signup.php"
 
+    - name: Make sure pymysql is present
+      pip:
+        name: pymysql
+        state: present
+
+    - name: Copy database dump file
+      copy:
+        src: dump.sql
+        dest: /tmp
+
+    - name: Run SQL commands to create table
+      mysql_db:
+        login_host: terraform-20211011105219025500000001.cvx1xix5yaol.us-east-2.rds.amazonaws.com
+        login_password: password
+        login_user: admin
+        login_port: 3306
+        name: myrdsdb
+        state: import
+        target: /tmp/dump.sql
