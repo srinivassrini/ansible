@@ -54,10 +54,6 @@ variable "privatesubnetcidr4" {
 variable "instance_ami" {
 	default = "ami-0443305dabd4be2bc"
 	}
-	
-variable "bastion_ami" {
-	default = "ami-00399ec92321828f5"
-	}
 
 variable "instance_type" {
 	default = "t2.micro"
@@ -175,45 +171,13 @@ resource "aws_security_group" "bastion" {
 resource "aws_instance" "bastionserver" {
 
   subnet_id              = aws_subnet.publicsubnet1.id
-  ami                    = var.bastion_ami
+  ami                    = var.instance_ami
   instance_type          = var.instance_type
   vpc_security_group_ids = [aws_security_group.bastion.id]
   key_name               = var.keyname
   user_data              = <<EOF
 #!/bin/bash
 # install httpd (Linux 2 version)
-sudo apt-get update
-sudo apt-get install software-properties-common -y
-sudo apt-add-repository ppa:ansible/ansible
-sudo apt-get update && sudo apt-get install ansible -y
-echo "-----BEGIN RSA PRIVATE KEY-----
-MIIEpQIBAAKCAQEA5LpBe4BDJfTyk2JJZ/5ixSl3b1mtt4Z/KA+PkxshKa48BLaG
-WuKET3aiPHBxLOfIolRR6fuiXi/mJAnG/V2GnUUFMZgMwtjLY+Ybp2tighp8oaEh
-sa4XexDOg14IhkxoRxNQJPZGLHrdbgh/fve1kajnhBatnkyESVsIvWPGsG4MOwri
-Aa5kioDSArDvqv++OtzcyjjAFaoYOup6iGfuKH3RmZxJVr6PnMZt4L5WwgLmiDH5
-xjyomxriu+2T8PGKeIaHAkgNQGyzcZfd5d0g+r9SxpfErsc4TvdoFyipslYF5BJK
-kckq4rwgKlOx12o1lm81FQCOPKX7GOt4tumNlQIDAQABAoIBAFg30lvM65kvMYRQ
-61kVz4iV5r/myc64LEEKR2kIlLDbx8BVmdph9YAklIxVHgGg4Exj0zg42rYTKWOK
-9dnxAaOU5FztdTaNoVzFerMHAvaFOr6oRDOgnuPTZqNaWFVcEPgg5c9rwUMUnGT9
-GBejeL9Wcv0KNiqQ/pDAcM2DNzYCcSuTLI1whTDYyklG/JeyRqWceXW3qnC0FIFU
-oOiyO3EUTJFRbk1Hk7cYUY7AGMovl5YyithAU1eDbGTZ5O7Ef2IqfgTAg2562QvJ
-Pg8+ysGsMy09WIj7Dklcl9kbR7X7sri/JH9D6J7kSX0m0oD9HoIUv6MObhz5AlAE
-f7CnpqECgYEA+XrbF4x0UQWoRi+upAyLGhdjNlODaUXznfGRPwKoSBPZfOPmiCrN
-xmNgVcmUwwpbLpJiDUXD/ONMe5O3D/XPjihPINSA+MCWLK5UKA16EJ/rM4OqUPzD
-QCDsC2ZPbPHtlm9tJL2rqu3oNYfJ7bfkHEAdm1LY/KmdSKptP+dOwr0CgYEA6rSO
-ds5r6J/Bbuijn0cVpjIWnrv4k2wkK2rUZOGLoYzkSANw1CdvV8auWWdjWb47/d1C
-2n8pxPKr26d5y+6kDiGrnRQ9eNXcTdaTRAEIAUUTFowOE2g/teY/7us2tV7vG4Wu
-cU6LwIXjlJMe2b90mm8b5VV7lkeZ2wszwVooz7kCgYEAlc8aZSeoaUbWZ18WpdgK
-Z56HqwW3Ma4ZvkxjBc1Ys/+HaCGKO1ZIvsrJ/HnR5NUBMBQi4Ql1yRPMx6BKG0Fm
-Y1z9Nx+kWrt68lW0n2CIXhdJq2NzELLXpFigpa/IHgmgu+cpSRjETx4RhKOHtEHq
-rrQpky3Kst4/XnVIqUkC2JkCgYEAjdCBUFoTq6Bz8X7R9titxRj4v/rWDMXH6RAI
-u9foVbna6YRitV4Kkd/z0wN8bWpbt13tGjbB10XF/9fm6QkNyZggqK3lItEd505i
-9zEkVBgXm4UOsD1KWa+BK+ylxttQ4LFaoQ4TtUVxKIHonytm2jWOhnirTzd+SHMx
-V4ARrskCgYEAiVTAPtspCqVfc3bdkK5t4y1virV2VJJ/ex5mGQ+vSwr4hXc+UA3s
-HMDAOHl4VVHCxQKSAbNfALVi8jdCSwKxrA+Hu6Mw4UHyuwZnkJxpsaPW7aQ1hg2w
-k9INwb52HairB4USB9kA6qw7vhts+v66Au46fqXZVUo7QEnS4TMEMc4=
------END RSA PRIVATE KEY-----" > /etc/ansible/ansible.pem
-
 yum update -y
 yum install -y httpd
 systemctl start httpd
