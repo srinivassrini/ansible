@@ -1,5 +1,5 @@
 - name: playbook to bootstrap managed ubuntu nodes
-  hosts: webserver
+  hosts: webservers
   become: true
   become_user: root
   gather_facts: true
@@ -17,11 +17,6 @@
       service:
         name: httpd
         state: restarted
-
-    - name: copy the endpoint template to the server
-      template:
-        src: "templates/endpoint"
-        dest: "/var/www/html/endpoint"
 
     - name: copy the website template to the server
       template:
