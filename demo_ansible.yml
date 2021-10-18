@@ -28,6 +28,11 @@
         src: "templates/signup.php"
         dest: "/var/www/html/signup.php"
 
+    - name: copy the website template to the server
+      template:
+        src: "templates/endpoint.php"
+        dest: "/var/www/html/endpoint.php"
+
     - name: Make sure pymysql is present
       pip:
         name: pymysql
