@@ -8,6 +8,12 @@ resource "local_file" "dbendpoint1" {
   filename = "endpoint"
 }
 
+resource "local_file" "dbendpoint_php" {
+  content  = "<?php\n$endpoint='${aws_db_instance.rds.address}';\n$username='${aws_db_instance.rds.username}';\n$password='${aws_db_instance.rds.password}';\n$dbname='${aws_db_instance.rds.name}';\n?>"
+  filename = "templates/endpoint.php"
+}
+
+
 resource "null_resource" "ansible" {
   provisioner "local-exec" {
     command = "ansible-playbook demo_ansible.yml"

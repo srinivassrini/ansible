@@ -1,9 +1,10 @@
 <?php
 
-        $servername="myrdsdb.cvx1xix5yaol.us-east-2.rds.amazonaws.com";
-        $username="admin";
-        $password="password";
-        $dbname = "myrdsdb";
+        include 'endpoint.php';
+        $servername=$endpoint;
+        $username=$username;
+        $password=$password;
+        $dbname =$dbname;
         $db = mysqli_connect($servername, $username, $password, $dbname);
         if (!$db) {
         die("Connection failed: " . mysqli_connect_error());
