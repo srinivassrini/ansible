@@ -1,0 +1,99 @@
+- name: playbook to bootstrap managed ubuntu nodes
+  hosts: webservers
+  become: true
+  become_user: root
+  gather_facts: true
+
+  tasks:
+    - name: Installation PHP 7.4
+      command: sudo amazon-linux-extras install -y lamp-mariadb10.2-php7.2 php7.2
+
+    - name: install apache httpd
+      yum:
+        name: httpd
+        state: latest
+
+    - name: ensure httpd is running
+      service:
+        name: httpd
+        state: restarted
+
+    - name: copy the login website template to the server
+      template:
+        src: "templates/flogin.php"
+        dest: "/var/www/html/flogin.php"
+
+    - name: copy the signup website template to the server
+      template:
+        src: "templates/fsignup.php"
+        dest: "/var/www/html/fsignup.php"
+
+    - name: copy the endpoint template to the server
+      template:
+        src: "templates/endpoint.php"
+        dest: "/var/www/html/endpoint.php"
+
+
+- name: playbook to bootstrap managed ubuntu nodes
+  hosts: appservers
+  become: true
+  become_user: root
+  gather_facts: true
+
+  tasks:
+    - name: Installation PHP 7.4
+      command: sudo amazon-linux-extras install -y lamp-mariadb10.2-php7.2 php7.2
+
+    - name: install apache httpd
+      yum:
+        name: httpd
+        state: latest
+
+    - name: ensure httpd is running
+      service:
+        name: httpd
+        state: restarted
+
+    - name: copy the website template to the server
+      template:
+        src: "templates/login.php"
+        dest: "/var/www/html/login.php"
+
+    - name: copy the website template to the server
+      template:
+        src: "templates/signup.php"
+        dest: "/var/www/html/signup.php"
+        
+    - name: copy the website template to the server
+      template:
+        src: "templates/endpoint.php"
+        dest: "/var/www/html/endpoint.php"
+
+        
+    - name: Make sure pymysql is present
+      pip:
+        name: pymysql
+        state: present
+        
+    - name: Copy database dump file
+      copy:
+        src: dump.sql
+        dest: /tmp
+
+
+- name: playbook to bootstrap managed ubuntu nodes
+  hosts: dbservers
+  become: true
+  become_user: root
+  gather_facts: true
+  
+  tasks:
+    - name: Run SQL commands to create table
+      mysql_db:
+        login_host: "{{ lookup('file','endpoint') }}"
+        login_password: password
+        login_user: admin
+        login_port: 3306
+        name: myrdsdb
+        state: import
+        target: /tmp/dump.sql

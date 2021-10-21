@@ -1,0 +1,1 @@
+CREATE TABLE login ( email VARCHAR(30), password VARCHAR(10));
