@@ -1,0 +1,33 @@
+-->linux
+
+sudo yum install -y yum-utils
+sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+sudo yum -y install terraform
+
+amazon-linux-extras install ansible2
+
+
+-->docker
+
+sudo yum update -y
+sudo amazon-linux-extras install docker -y
+sudo yum install docker
+sudo service docker start
+sudo usermod -a -G docker ec2-user
+
+
+{
+FROM php:7.4-apache
+
+RUN apt-get update
+RUN docker-php-ext-install pdo pdo_mysql mysqli
+
+COPY . /var/www/html/
+
+EXPOSE 80
+}
+
+RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
+
+docker build -t hello-world .
+docker run -t -i -p 80:80 hello-world

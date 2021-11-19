@@ -1,0 +1,43 @@
+- name: playbook for deploy
+  hosts: webservers
+  become: true
+  become_user: root
+  gather_facts: true
+
+- name: playbook to bootstrap managed ubuntu nodes
+  hosts: appservers
+  become: true
+  become_user: root
+  gather_facts: true
+  
+- name: playbook to bootstrap managed ubuntu nodes
+  hosts: dbservers
+  become: true
+  become_user: root
+  gather_facts: true
+
+  tasks:
+    - name: Installation PHP 7.4
+      command: sudo amazon-linux-extras install -y lamp-mariadb10.2-php7.2 php7.2
+
+    - name: Make sure pymysql is present
+      pip:
+        name: pymysql
+        state: present
+
+    - name: Copy database dump file
+      copy:
+        src: dump.sql
+        dest: /tmp
+
+    - include_vars: db_vars.yml
+
+    - name: Run SQL commands to create table
+      mysql_db:
+        login_host: "{{ endpoint }}"
+        login_password: "{{ password }}"
+        login_user: "{{ username }}"
+        login_port: 3306
+        name: "{{ dbname }}"
+        state: import
+        target: /tmp/dump.sql
